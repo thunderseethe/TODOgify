@@ -1,9 +1,12 @@
 package com.thunderseethe.todogfy;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 
@@ -28,12 +31,19 @@ public class TodoCardView extends CardView {
         super(context, attrs, defStyleAttr);
 
         strikethrough_paint = new Paint();
-        strikethrough_paint.setColor(Color.BLACK);
-        strikethrough_paint.setStrokeWidth(3.0f);
         strikethrough_paint.setAntiAlias(true);
+        strikethrough_paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
 
-        if (attrs == null) return;
+        /*if(attrs == null) return;
+        strikethrough_paint.setStrokeWidth(attrs.getAttributeFloatValue(R.attr.strikethroughColor, 3.0f));
+        strikethrough_paint.setColor(attrs.getAttributeIntValue(R.attr.strikethroughWidth, Color.BLACK));
+        */
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TodoCardView);
 
+        strikethrough_paint.setColor(a.getColor(R.styleable.TodoCardView_strikethroughColor, Color.BLACK));
+        strikethrough_paint.setStrokeWidth(a.getFloat(R.styleable.TodoCardView_strikethroughWidth, 3.0f));
+
+        a.recycle();
     }
 
     public void strikethrough(boolean _strikethrough){
@@ -41,14 +51,13 @@ public class TodoCardView extends CardView {
     }
 
     @Override
-    public void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+    protected void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
 
         final int height = getHeight();
         final int width = getWidth();
 
         if(strikethrough)
             canvas.drawLine(20, height / 2, width - 20, height / 2, strikethrough_paint);
-
     }
 }

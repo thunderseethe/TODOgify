@@ -29,10 +29,8 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
 
         if(viewType == ITEM)
             v = LayoutInflater.from(parent.getContext()).inflate(R.layout.todo_item, parent, false);
-        else {
-            Log.d("BindFooter", "created");
+        else
             v = LayoutInflater.from(parent.getContext()).inflate(R.layout.new_todo_item, parent, false);
-        }
 
         return new TodoVH(v, viewType);
     }
@@ -45,24 +43,25 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
         holder.root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Log.d("OnClickListener", String.format("%d %b", position, !item.complete));
                 adapter.content.set(position, item.complete(!item.complete));
                 adapter.notifyItemChanged(position);
             }
         });
 
-        /*if(item.complete)
-            holder.text_view.setPaintFlags(holder.text_view.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-        else
-            holder.text_view.setPaintFlags(holder.text_view.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));*/
         ((TodoCardView)holder.root).strikethrough(item.complete);
+        if(item.complete) {
+            holder.root.setBackgroundColor(0xFFE0E0E0);
+            holder.text_view.setTextColor(0xFFAAAAAA);
+        } else {
+            holder.root.setBackgroundColor(0xFFFFFFFF);
+            holder.text_view.setTextColor(0xFF000000);
+        }
+
     }
 
     public void bindFooter(final TodoVH holder, final List<Todo> content) {
         //Empty for now
         final TodoAdapter adapter = this;
-        Log.d("BindFooter", "called");
         holder.edit_text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
