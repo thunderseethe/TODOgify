@@ -1,5 +1,6 @@
 package com.thunderseethe.todogfy;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_edit:
+                Intent edit_intent = new Intent()
                 //Edit activity intent here
                 return true;
             default:
