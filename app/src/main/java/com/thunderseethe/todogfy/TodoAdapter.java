@@ -66,13 +66,12 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 String task = holder.edit_text.getText().toString();
-                holder.edit_text.setText("");
 
                 adapter.notifyItemInserted(adapter.content.size());
                 adapter.content.add(new Todo(task, false));
 
+                holder.edit_text.setText("");
                 holder.edit_text.requestFocus();
-                //holder.edit_text.setText("");
                 return true;
             }
         });

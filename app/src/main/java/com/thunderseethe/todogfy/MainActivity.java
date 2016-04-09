@@ -10,9 +10,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,10 +35,30 @@ public class MainActivity extends AppCompatActivity {
 
         list_view.setLayoutManager(new LinearLayoutManager(this));
 
-        List<Todo> todos = new LinkedList<Todo>();
+        List<Todo> todos = new LinkedList<>();
         todos.add(new Todo("Test 1", true));
         todos.add(new Todo("Test 2", false));
 
         list_view.setAdapter(new TodoAdapter(todos));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.action_edit:
+                //Edit activity intent here
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 }
