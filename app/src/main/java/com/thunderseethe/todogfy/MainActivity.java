@@ -22,9 +22,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("TODOgify");
-        toolbar.setTitleTextColor(0xFFEDE7F6);
-        toolbar.setBackgroundColor(0xFFAB47BC);
+        toolbar.setTitle("");
+        toolbar.setTitleTextColor(0xFF000000);
+        toolbar.setBackgroundColor(0xFFFFFFFF);
         setSupportActionBar(toolbar);
 
         RecyclerView list_view = (RecyclerView) findViewById(R.id.list_view);
