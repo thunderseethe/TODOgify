@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         toolbar.setTitleTextColor(0xFF000000);
-        toolbar.setBackgroundColor(0xFFFFFFFF);
+        toolbar.setBackgroundColor(0xFFFFA500);
         setSupportActionBar(toolbar);
 
         RecyclerView list_view = (RecyclerView) findViewById(R.id.list_view);
