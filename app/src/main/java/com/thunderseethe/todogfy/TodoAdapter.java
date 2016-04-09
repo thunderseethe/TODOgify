@@ -29,8 +29,10 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
 
         if(viewType == ITEM)
             v = LayoutInflater.from(parent.getContext()).inflate(R.layout.todo_item, parent, false);
-        else
+        else {
+            Log.d("BindFooter", "created");
             v = LayoutInflater.from(parent.getContext()).inflate(R.layout.new_todo_item, parent, false);
+        }
 
         return new TodoVH(v, viewType);
     }
@@ -50,22 +52,24 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
             }
         });
 
-        if(item.complete)
+        /*if(item.complete)
             holder.text_view.setPaintFlags(holder.text_view.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         else
-            holder.text_view.setPaintFlags(holder.text_view.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
+            holder.text_view.setPaintFlags(holder.text_view.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));*/
+        ((TodoCardView)holder.root).strikethrough(item.complete);
     }
 
     public void bindFooter(final TodoVH holder, final List<Todo> content) {
         //Empty for now
         final TodoAdapter adapter = this;
+        Log.d("BindFooter", "called");
         holder.edit_text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 String task = holder.edit_text.getText().toString();
                 holder.edit_text.setText("");
 
-                adapter.notifyItemChanged(adapter.content.size() - 1);
+                adapter.notifyItemInserted(adapter.content.size());
                 adapter.content.add(new Todo(task, false));
 
                 holder.edit_text.requestFocus();
@@ -73,6 +77,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
                 return true;
             }
         });
+        //holder.edit_text.requestFocus();
     }
 
     @Override
