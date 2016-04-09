@@ -15,4 +15,11 @@ public class Todo {
         task = _task;
         complete = _complete;
     }
+
+    public Todo complete(boolean _complete) {
+        return new Todo(task, _complete);
+    }
+    public Todo task(String _task) {
+        return new Todo(_task, complete);
+    }
 }

@@ -35,11 +35,25 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
         return new TodoVH(v, viewType);
     }
 
-    public void bindItem(TodoVH holder, Todo item) {
+    public void bindItem(final TodoVH holder, final int position) {
+        final TodoAdapter adapter = this;
+        final Todo item = this.content.get(position);
+
         holder.text_view.setText(item.task);
+        holder.root.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Log.d("OnClickListener", String.format("%d %b", position, !item.complete));
+                adapter.content.set(position, item.complete(!item.complete));
+                adapter.notifyItemChanged(position);
+            }
+        });
 
         if(item.complete)
             holder.text_view.setPaintFlags(holder.text_view.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        else
+            holder.text_view.setPaintFlags(holder.text_view.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
     }
 
     public void bindFooter(final TodoVH holder, final List<Todo> content) {
@@ -48,12 +62,13 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
         holder.edit_text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                Log.d("EditorActionListener", "called");
                 String task = holder.edit_text.getText().toString();
                 holder.edit_text.setText("");
+
                 adapter.notifyItemChanged(adapter.content.size() - 1);
                 adapter.content.add(new Todo(task, false));
 
+                holder.edit_text.requestFocus();
                 //holder.edit_text.setText("");
                 return true;
             }
@@ -61,10 +76,10 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
     }
 
     @Override
-    public void onBindViewHolder(final TodoVH holder, int position) {
+    public void onBindViewHolder(final TodoVH holder, final int position) {
         switch (holder.type) {
             case ITEM:
-                bindItem(holder, this.content.get(position));
+                bindItem(holder, position);
                 break;
             case FOOTER:
                 bindFooter(holder, this.content);
