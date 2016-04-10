@@ -26,7 +26,7 @@
             android:layout_height="match_parent"
             android:fontFamily="sans-serif"
             android:text = "Edit Todo List"
-            android:textSize="30sp"
+            android:textSize="25sp"
             android:textColor="@color/title"
             />
 
