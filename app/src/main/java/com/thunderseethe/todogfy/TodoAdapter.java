@@ -25,7 +25,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
     public final List<Todo> content;
 
     private int choice = 0;
-    private String strName;
+    private String strName = "0";
     private MainActivity main;
 
     public TodoAdapter(List<Todo> _content, MainActivity m){
