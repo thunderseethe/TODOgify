@@ -41,8 +41,8 @@ public class Todo implements Parcelable {
     public Todo task(String _task) {return new Todo(id, _task, complete, priority);
     }
 
-    public Todo importance(String _task) { //function to find the importance of a todo given the number of "!"s at the end of the string
-        if(_task.indexOf("!")<0)
+    public Todo priority(String _task) { //function to find the importance of a todo given the number of "!"s at the end of the string
+        if(!_task.contains("!"))
             return new Todo(id,task,complete,0); //case for if there are no !'s
         int sum=0;
         for(int i=_task.lastIndexOf("!");i>=_task.indexOf("!");i--){//if there are !'s, step backwards through the string until you reach a non-! character
@@ -51,10 +51,26 @@ public class Todo implements Parcelable {
             else
                 break; //breaking if there's a character between the first and last "!"
         }
+        if(sum>5)
+            sum=5;
         return new Todo(id,task,complete,sum);
     }
 
-    public int getImportance(){return priority;}
+    public String editTask(String _task){
+        String clone; //cloning the _task for editting purposes
+        int end =_task.length()-1;
+        for(int i=_task.lastIndexOf("!"); i>= 0;i--) {
+            if(_task.charAt(i)!='!'){
+                end=i;
+                break;
+            }
+        }
+
+        clone=_task.substring(0,end+1);
+        return clone;
+    }
+
+    public int getPriority(){return priority;}
 
     @Override
     public int describeContents() {

@@ -133,11 +133,15 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String temp = arrayAdapter.getItem(which);
-                                choice = Integer.parseInt(temp);
-                                strName = "(" + choice + ") " + tempString;
+                                //String temp = arrayAdapter.getItem(which);
+                               // choice = Integer.parseInt(temp);
+                                strName = tempString;
                                 adapter.notifyItemInserted(adapter.content.size());
-                                adapter.content.add(new Todo(strName, false, choice));
+                                Todo tmp = new Todo(strName,false);
+                                tmp=tmp.priority(strName);
+                                int priority=tmp.getPriority();
+                                String parsed=tmp.editTask(strName);
+                                adapter.content.add(new Todo(parsed, false, priority));
                             }
                         });
 
