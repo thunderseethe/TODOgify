@@ -47,7 +47,7 @@ public class Todo implements Parcelable {
         return new Todo(id, task, _complete);
     }
     public Todo task(String _task) {
-        return new Todo(id, _task, complete);
+        return new Todo(id, _task, complete, importance);
     }
 
     public int getImportance(){return importance;}

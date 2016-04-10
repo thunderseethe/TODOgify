@@ -26,6 +26,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
 
     private int choice = 0;
     private String strName = "0";
+    private String tempString = "";
     private MainActivity main;
 
     public TodoAdapter(List<Todo> _content, MainActivity m){
@@ -74,8 +75,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
         holder.edit_text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                String task = holder.edit_text.getText().toString();
-
+                tempString = holder.edit_text.getText().toString();
 //                // Get the importance before making a task
 //                AlertDialog.Builder builder = new AlertDialog.Builder(main);
 //                builder.setTitle("Enter Task Importance (default 0)");
@@ -132,18 +132,15 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                strName = arrayAdapter.getItem(which);
+                                String temp = arrayAdapter.getItem(which);
+                                choice = Integer.parseInt(temp);
+                                strName = "(" + choice + ") " + tempString;
+                                adapter.notifyItemInserted(adapter.content.size());
+                                adapter.content.add(new Todo(strName, false, choice));
                             }
                         });
 
                 builderSingle.show();
-
-                int converted = Integer.parseInt(strName);
-
-                // Regularly scheduled adding events
-
-                adapter.notifyItemInserted(adapter.content.size());
-                adapter.content.add(new Todo(task, false, converted));
 
                 holder.edit_text.setText("");
                 holder.edit_text.requestFocus();
