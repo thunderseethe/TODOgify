@@ -1,9 +1,18 @@
 package com.thunderseethe.todogfy;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Handler;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -14,7 +23,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -22,33 +35,73 @@ import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
 
-    private List<Todo> todoList;
-    private RecyclerView listView;
     private TodoAdapter adapter;
+    private RecyclerView list_view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Setup toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         toolbar.setTitleTextColor(0xFF000000);
-        toolbar.setBackgroundColor(0xFFFFA500);
+        toolbar.setBackgroundColor(0xFF30729B);
         setSupportActionBar(toolbar);
 
-        RecyclerView list_view = (RecyclerView) findViewById(R.id.list_view);
+        // Setup notification bar
+        Window window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(0xFF30729B);
 
+        // Setup recycle view
+        list_view = (RecyclerView) findViewById(R.id.list_view);
         list_view.setLayoutManager(new LinearLayoutManager(this));
-        listView = list_view;
+        List<Todo> todos = pullTodos();
 
-        List<Todo> todos = new LinkedList<>();
-        todoList = todos;
-        todos.add(new Todo("Test 1", true));
-        todos.add(new Todo("Test 2", false));
-
-        adapter = new TodoAdapter(todos);
+        // Setup adapter
+        adapter = new TodoAdapter(todos, this);
         list_view.setAdapter(adapter);
+    }
+
+    public List<Todo> pullTodos() {
+        SQLiteDatabase db = new TodoDB(this).getReadableDatabase();
+        Cursor c = db.query(TodoDB.TodoEntry.TABLE_NAME, null, null, null, null, null, null);
+        List<Todo> todos = new LinkedList<>();
+
+        if(c.getCount() == 0) return todos;
+        c.moveToFirst();
+
+        do {
+            int id = c.getInt(c.getColumnIndex(TodoDB.TodoEntry.COLUMN_ID));
+            String task  = c.getString(c.getColumnIndex(TodoDB.TodoEntry.COLUMN_TASK));
+            boolean complete = c.getInt(c.getColumnIndex(TodoDB.TodoEntry.COLUMN_COMPLETED)) != 0;
+            todos.add(new Todo(id, task, complete));
+        } while(c.moveToNext());
+
+        c.close();
+
+        return todos;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        SQLiteDatabase db = new TodoDB(this).getWritableDatabase();
+        db.beginTransaction();
+        db.execSQL("DELETE FROM " + TodoDB.TodoEntry.TABLE_NAME + ";");
+        for(Todo todo : adapter.content) {
+            ContentValues values = new ContentValues();
+            if(todo.id != -1)
+                values.put(TodoDB.TodoEntry.COLUMN_ID, todo.id);
+            values.put(TodoDB.TodoEntry.COLUMN_TASK, todo.task);
+            values.put(TodoDB.TodoEntry.COLUMN_COMPLETED, todo.complete ? 1 : 0);
+            db.insert(TodoDB.TodoEntry.TABLE_NAME, null, values);
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
     }
 
     @Override
@@ -59,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public List<Todo> filter(List<Todo> oldList){
+    public List<Todo> filterNotCompleted(List<Todo> oldList){
         List<Todo> newList = new LinkedList<Todo>();
 
         for (Todo todo : oldList) {
@@ -67,6 +120,26 @@ public class MainActivity extends AppCompatActivity {
                 newList.add(todo);
         }
 
+        if(newList.size() == 0){
+            Intent intent = new Intent();
+            PendingIntent pIntent = PendingIntent.getActivity(this,0,intent,0);
+            final Notification push = new Notification.Builder(this)
+                    .setTicker("Ticker Title")
+                    .setContentTitle("All Tasks Completed")
+                    .setContentText("Congratulations! Click me to update tasks")
+                    .setSmallIcon(R.drawable.check)
+                    .setContentIntent(pIntent).getNotification();
+            push.flags=Notification.FLAG_AUTO_CANCEL;
+            final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            //notificationManager.notify(0, push);
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    notificationManager.notify(0, push);
+                }
+            }, 2000);
+        }
         return newList;
     }
 
@@ -74,17 +147,26 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_edit:
-                Intent edit_intent = new Intent();
-                //Edit activity intent here
+                Intent edit_intent = new Intent(this, EditActivity.class);
+                edit_intent.putParcelableArrayListExtra("todos", new ArrayList<>(adapter.content));
+                startActivityForResult(edit_intent, 0);
                 return true;
             case R.id.action_clear:
-                listView.setAdapter(new TodoAdapter(filter(adapter.content)));
-
+                adapter = new TodoAdapter(filterNotCompleted(adapter.content), this);
+                list_view.setAdapter(adapter);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
 
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(data == null) return;
 
+        List<Todo> todos = data.getParcelableArrayListExtra("todos");
+        adapter = new TodoAdapter(todos, this);
+        list_view.setAdapter(adapter);
+    }
 }

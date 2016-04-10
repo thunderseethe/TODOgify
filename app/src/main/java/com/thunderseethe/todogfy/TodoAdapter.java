@@ -1,14 +1,20 @@
 package com.thunderseethe.todogfy;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.LinkedList;
 import java.util.List;
 
 //https://github.com/thunderseethe/TODOgify.git
@@ -19,8 +25,14 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
 
     public final List<Todo> content;
 
-    public TodoAdapter(List<Todo> _content){
+    private int choice = 0;
+    private String strName = "0";
+    private String tempString = "";
+    private MainActivity main;
+
+    public TodoAdapter(List<Todo> _content, MainActivity m){
         this.content = _content;
+        main = m;
     }
 
     @Override
@@ -56,7 +68,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
             holder.root.setBackgroundColor(0xFFFFFFFF);
             holder.text_view.setTextColor(0xFF000000);
         }
-
     }
 
     public void bindFooter(final TodoVH holder, final List<Todo> content) {
@@ -65,17 +76,107 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
         holder.edit_text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                String task = holder.edit_text.getText().toString();
+                tempString = holder.edit_text.getText().toString();
+//                // Get the importance before making a task
+//                AlertDialog.Builder builder = new AlertDialog.Builder(main);
+//                builder.setTitle("Enter Task Importance (default 0)");
+//
+//                // Set up the input
+//                final EditText input = new EditText(main);
+//                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+//                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+//                builder.setView(input);
+//
+//                // Set up the buttons
+//                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        m_Text = input.getText().toString();
+//                    }
+//                });
+//                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        m_Text = "0";
+//                        dialog.cancel();
+//                    }
+//                });
+//
+//                builder.show();
+//                int importance = Integer.parseInt(m_Text);
 
-                adapter.notifyItemInserted(adapter.content.size());
-                adapter.content.add(new Todo(task, false));
+                AlertDialog.Builder builderSingle = new AlertDialog.Builder(main);
+                builderSingle.setIcon(R.drawable.check);
+                builderSingle.setTitle("Select Task Importance");
+
+                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                        main,
+                        android.R.layout.select_dialog_singlechoice);
+                arrayAdapter.add("5");
+                arrayAdapter.add("4");
+                arrayAdapter.add("3");
+                arrayAdapter.add("2");
+                arrayAdapter.add("1");
+
+                builderSingle.setNegativeButton(
+                        "cancel",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                choice = 0;
+                                dialog.dismiss();
+                            }
+                        });
+
+                builderSingle.setAdapter(
+                        arrayAdapter,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String temp = arrayAdapter.getItem(which);
+                                choice = Integer.parseInt(temp);
+                                strName = "(" + choice + ") " + tempString;
+                                adapter.notifyItemInserted(adapter.content.size());
+                                adapter.content.add(new Todo(strName, false, choice));
+                            }
+                        });
+
+                builderSingle.show();
+
+//                // Sort Content
+//                List<Todo> newContent = new LinkedList<Todo>();
+//                for(Todo todo : content){
+//                    boolean added = false;
+//                    if(newContent.size() == 0){
+//                        newContent.add(todo);
+//                        added = true;
+//                    }
+//                    else{
+//                        for(int x = 0; x < newContent.size(); x++){
+//                            if(todo.getImportance() >= newContent.get(i).getImportance()){
+//                                newContent.add(i,todo);
+//                                added = true;
+//                            }
+//                        }
+//                        if(!added){
+//                            newContent.add(todo);
+//                        }
+//                    }
+//                }
+//
+//                // duplicate newContent into content
+//                while(!content.isEmpty()){
+//                    content.remove(0);
+//                }
+//                for(Todo todo: newContent){
+//                    content.add(todo);
+//                }
 
                 holder.edit_text.setText("");
                 holder.edit_text.requestFocus();
                 return true;
             }
         });
-        //holder.edit_text.requestFocus();
     }
 
     @Override
