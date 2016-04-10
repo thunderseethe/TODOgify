@@ -42,14 +42,14 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         toolbar.setTitleTextColor(0xFF000000);
-        toolbar.setBackgroundColor(0xFFFFA500);
+        toolbar.setBackgroundColor(0xFF30729B);
         setSupportActionBar(toolbar);
 
         // Setup notification bar
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(0xFFFFA500);
+        window.setStatusBarColor(0xFF30729B);
 
         // Setup recycle view
         list_view = (RecyclerView) findViewById(R.id.list_view);
