@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Handler;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -17,9 +15,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
@@ -58,15 +56,28 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    public List<Todo> filter(List<Todo> oldList){
+        List<Todo> newList = new LinkedList<Todo>();
+
+        for (Todo todo : oldList) {
+            if(!todo.complete)
+                newList.add(todo);
+        }
+
+        return newList;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_edit:
-                Intent edit = new Intent(this, EditActivity.class);
-                edit.putParcelableArrayListExtra("todos", new ArrayList<>(adapter.content));
-                startActivityForResult(edit, 0);
+                Intent edit_intent = new Intent();
                 //Edit activity intent here
                 return true;
+            case R.id.action_clear:
+                adapter = new TodoAdapter(filter(adapter.content));
+                list_view.setAdapter(adapter);
+
             default:
                 return super.onOptionsItemSelected(item);
         }
