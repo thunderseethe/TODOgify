@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         List<Todo> todos = pullTodos();
 
         // Setup adapter
-        adapter = new TodoAdapter(todos);
+        adapter = new TodoAdapter(todos, this);
         list_view.setAdapter(adapter);
     }
 
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(edit_intent, 0);
                 return true;
             case R.id.action_clear:
-                adapter = new TodoAdapter(filterNotCompleted(adapter.content));
+                adapter = new TodoAdapter(filterNotCompleted(adapter.content), this);
                 list_view.setAdapter(adapter);
                 return true;
             default:
@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         if(data == null) return;
 
         List<Todo> todos = data.getParcelableArrayListExtra("todos");
-        adapter = new TodoAdapter(todos);
+        adapter = new TodoAdapter(todos, this);
         list_view.setAdapter(adapter);
     }
 }

@@ -10,6 +10,7 @@ public class Todo implements Parcelable {
     public final int id;
     public final String task;
     public final boolean complete;
+    private int importance;
 
     public Todo(String _task){
         this(-1, _task, false);
@@ -17,10 +18,22 @@ public class Todo implements Parcelable {
     public Todo(String _task, boolean _complete) {
         this(-1, _task, _complete);
     }
+    public Todo(String _task, boolean _complete, int _importance){
+        id = -1;
+        task = _task;
+        complete = _complete;
+        importance = _importance;
+    }
     public Todo(int _id, String _task, boolean _complete) {
         id = _id;
         task = _task;
         complete = _complete;
+    }
+    public Todo(int _id, String _task, boolean _complete, int _importance) {
+        id = _id;
+        task = _task;
+        complete = _complete;
+        importance = _importance;
     }
 
     protected Todo(Parcel in) {
@@ -36,6 +49,9 @@ public class Todo implements Parcelable {
     public Todo task(String _task) {
         return new Todo(id, _task, complete);
     }
+
+    public int getImportance(){return importance;}
+    public void setImportance(int i){importance = i;}
 
     @Override
     public int describeContents() {
