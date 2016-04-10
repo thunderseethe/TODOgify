@@ -48,5 +48,8 @@
         android:layout_below="@+id/toolbar"
         android:clipToPadding="false"
         />
-
+    <com.thunderseethe.todogfy.Percentage
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
 </RelativeLayout>

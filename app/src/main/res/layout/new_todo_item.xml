@@ -16,7 +16,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:hint="New Task"
-        android:inputType="text"
-        />
+        android:inputType="text">
+
+    </EditText>
 
 </android.support.v7.widget.CardView>
