@@ -28,6 +28,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -51,19 +52,27 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // Setup notification bar
-        Window window = this.getWindow();
+        /*Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(0xFF30729B);
+        window.setStatusBarColor(0xFF30729B);*/
 
         // Setup recycle view
         list_view = (RecyclerView) findViewById(R.id.list_view);
         list_view.setLayoutManager(new LinearLayoutManager(this));
         List<Todo> todos = pullTodos();
 
+
         // Setup adapter
+        startService(todos);
         adapter = new TodoAdapter(todos, this);
         list_view.setAdapter(adapter);
+    }
+
+    public void startService(List<Todo> todos) {
+        Intent service = new Intent(this, NotificationService.class);
+        service.putExtra("todo", Collections.max(todos));
+        startService(service);
     }
 
     public List<Todo> pullTodos() {
@@ -90,16 +99,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         SQLiteDatabase db = new TodoDB(this).getWritableDatabase();
+        ContentValues values = new ContentValues();
+
         db.beginTransaction();
         db.execSQL("DELETE FROM " + TodoDB.TodoEntry.TABLE_NAME + ";");
+
         for(Todo todo : adapter.content) {
-            ContentValues values = new ContentValues();
+
             if(todo.id != -1)
                 values.put(TodoDB.TodoEntry.COLUMN_ID, todo.id);
             values.put(TodoDB.TodoEntry.COLUMN_TASK, todo.task);
             values.put(TodoDB.TodoEntry.COLUMN_COMPLETED, todo.complete ? 1 : 0);
+
             db.insert(TodoDB.TodoEntry.TABLE_NAME, null, values);
         }
+
         db.setTransactionSuccessful();
         db.endTransaction();
     }
