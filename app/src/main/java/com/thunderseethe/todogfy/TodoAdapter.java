@@ -19,13 +19,12 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
     public static final int FOOTER = 1;
 
     public final List<Todo> content;
-    private final MainActivity activity;
     private boolean editing = false;
 
 
-    public TodoAdapter(List<Todo> _content, MainActivity _activity){
+
+    public TodoAdapter(List<Todo> _content){
         this.content = _content;
-        this.activity = _activity;
     }
 
     @Override
@@ -98,8 +97,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
 
                 editing = true;
                 holder.edit_text.setText("");
-
-                activity.startService(adapter.content);
 
                 return true;
             }

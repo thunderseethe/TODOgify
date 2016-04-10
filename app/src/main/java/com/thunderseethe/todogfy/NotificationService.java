@@ -9,12 +9,18 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class NotificationService extends Service {
 
-    public NotificationManager manager;
+    private NotificationManager manager;
+    //private List<Todo> content;
 
     public NotificationService() {}
 
@@ -23,14 +29,17 @@ public class NotificationService extends Service {
         manager = (NotificationManager)this.getSystemService(NOTIFICATION_SERVICE);
     }
 
-    public void start(Todo todo){
+    public void start(List<Todo> todos){
+        Todo todo = Collections.min(todos);
+
         Intent main_activity = new Intent(this, MainActivity.class);
         PendingIntent pending_main_activity = PendingIntent.getActivity(this, 0, main_activity, 0);
 
         Intent complete_intent = new Intent(this, this.getClass());
         complete_intent.setAction("complete");
         complete_intent.putExtra("todo", todo);
-        PendingIntent pending_complete = PendingIntent.getService(this, 0, complete_intent, 0);
+        complete_intent.putParcelableArrayListExtra("todos", new ArrayList<>(todos));
+        PendingIntent pending_complete = PendingIntent.getService(this, 0, complete_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification notification =
             new NotificationCompat.Builder(this)
@@ -45,42 +54,41 @@ public class NotificationService extends Service {
         manager.notify(0, notification);
     }
 
-    public void complete(Todo todo){
+    public void complete(Todo todo, List<Todo> todos){
         SQLiteDatabase db = new TodoDB(this).getWritableDatabase();
         ContentValues values = new ContentValues();
+
         if(todo.id != -1)
             values.put(TodoDB.TodoEntry.COLUMN_ID, todo.id);
         values.put(TodoDB.TodoEntry.COLUMN_TASK, todo.task);
         values.put(TodoDB.TodoEntry.COLUMN_COMPLETED, 1);
         values.put(TodoDB.TodoEntry.COLUMN_PRIORITY, todo.priority);
 
-
-        db.beginTransaction();
-
         db.insertWithOnConflict(TodoDB.TodoEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-        Cursor c = db.rawQuery(
-            "SELECT id, task, completed, MAX(priority) priority FROM todo WHERE completed != 1"
-            , null);
 
-        /*
-        "SELECT *"+
-        " FROM " + TodoDB.TodoEntry.TABLE_NAME +
-        " WHERE " + TodoDB.TodoEntry.COLUMN_COMPLETED + " != 1 " +
-        " AND " + TodoDB.TodoEntry.COLUMN_PRIORITY + " == MAX(" + TodoDB.TodoEntry.COLUMN_PRIORITY + ")"
-        */
 
-        db.setTransactionSuccessful();
-        db.endTransaction();
+        for(int i = 0; i < todos.size(); i += 1) {
+            if(todo.id == todos.get(i).id){
+                Log.d("NotificationService", todos.get(i).toString());
+                todos.remove(i);
+            }
+        }
 
-        c.moveToFirst();
-        int id = c.getInt(c.getColumnIndex(TodoDB.TodoEntry.COLUMN_ID));
-        String task  = c.getString(c.getColumnIndex(TodoDB.TodoEntry.COLUMN_TASK));
-        boolean complete = c.getInt(c.getColumnIndex(TodoDB.TodoEntry.COLUMN_COMPLETED)) != 0;
-        int priority = c.getInt(c.getColumnIndex(TodoDB.TodoEntry.COLUMN_PRIORITY));
-        c.close();
+        if(todos.isEmpty()) {
+            Log.d("NotificationService", "empty content");
+            stopSelf();
+            return;
+        }
 
-        start(new Todo(id, task, complete, priority));
+        start(todos);
+    }
 
+    public void stop() {
+        stopSelf();
+    }
+
+    public void onDestroy() {
+        manager.cancel(0);
     }
 
     @Override
@@ -91,10 +99,15 @@ public class NotificationService extends Service {
 
         Log.d("NotificationService", String.format("action: %s", intent.getAction()));
         if(intent.getAction().equals("start")){
-            start((Todo)intent.getParcelableExtra("todo"));
+            List<Todo> todos = intent.getParcelableArrayListExtra("todos");
+            start(todos);
         }
         if(intent.getAction().equals("complete")){
-            complete((Todo)intent.getParcelableExtra("todo"));
+            List<Todo> todos = intent.getParcelableArrayListExtra("todos");
+            complete((Todo)intent.getParcelableExtra("todo"), todos);
+        }
+        if(intent.getAction().equals("stop")){
+            stopSelf();
         }
 
         return START_STICKY;

@@ -62,19 +62,28 @@ public class MainActivity extends AppCompatActivity {
         // Setup recycle view
         list_view = (RecyclerView) findViewById(R.id.list_view);
         list_view.setLayoutManager(new LinearLayoutManager(this));
+
+
         List<Todo> todos = pullTodos();
-
-
-        // Setup adapter
-        startService(todos);
-        adapter = new TodoAdapter(todos, this);
+        adapter = new TodoAdapter(todos);
         list_view.setAdapter(adapter);
+        // Setup adapter
+        //startService(todos);
+
     }
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        stopService(new Intent(this, NotificationService.class));
+    }
+
 
     public void startService(List<Todo> todos) {
         if(todos.isEmpty()) return;
         Intent service = new Intent(this, NotificationService.class);
-        service.putExtra("todo", Collections.max(filterNotCompleted(todos)));
+        //service.putExtra("todo", Collections.min(filterCompletion(todos, false)));
+        service.putParcelableArrayListExtra("todos", new ArrayList<>(filterCompletion(todos, false)));
         service.setAction("start");
         startService(service);
     }
@@ -98,12 +107,13 @@ public class MainActivity extends AppCompatActivity {
 
         c.close();
 
+        Collections.sort(todos);
         return todos;
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         SQLiteDatabase db = new TodoDB(this).getWritableDatabase();
         ContentValues values = new ContentValues();
 
@@ -126,6 +136,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+
+
+        startService(adapter.content);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
@@ -133,11 +151,21 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public List<Todo> filterNotCompleted(List<Todo> oldList){
+    /*public List<Todo> filterNotCompleted(List<Todo> oldList){
         List<Todo> newList = new LinkedList<>();
 
         for (Todo todo : oldList) {
             if(!todo.complete)
+                newList.add(todo);
+        }
+
+        return newList;
+    }*/
+    public List<Todo> filterCompletion(List<Todo> oldList, boolean completion){
+        List<Todo> newList = new LinkedList<>();
+
+        for(Todo todo : oldList){
+            if(todo.complete == completion)
                 newList.add(todo);
         }
 
@@ -153,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(edit_intent, 0);
                 return true;
             case R.id.action_clear:
-                adapter = new TodoAdapter(filterNotCompleted(adapter.content), this);
+                adapter = new TodoAdapter(filterCompletion(adapter.content, false));
                 list_view.setAdapter(adapter);
                 return true;
             default:
@@ -167,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
         if(data == null) return;
 
         List<Todo> todos = data.getParcelableArrayListExtra("todos");
-        adapter = new TodoAdapter(todos, this);
+        adapter = new TodoAdapter(todos);
         list_view.setAdapter(adapter);
     }
 }
