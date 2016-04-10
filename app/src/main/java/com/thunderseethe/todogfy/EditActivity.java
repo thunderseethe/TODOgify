@@ -38,10 +38,10 @@ public class EditActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // Setup notification bar
-        Window window = this.getWindow();
+        /*Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(0xFF30729B);
+        window.setStatusBarColor(0xFF30729B);*/
 
         RecyclerView list_view = (RecyclerView)findViewById(R.id.list_view);
 

@@ -1,6 +1,8 @@
 package com.thunderseethe.todogfy;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,18 +35,30 @@ public class TodoEditAdapter extends RecyclerView.Adapter<TodoEditVH> {
         final TodoEditAdapter adapter = this;
 
         holder.edit_text.setText(item.task);
-        holder.edit_text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        /*holder.edit_text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                content.set(holder.getAdapterPosition(), item.task(textView.getText().toString()));
-                return true;
+            content.set(holder.getAdapterPosition(), item.task(textView.getText().toString()));
+            return true;
+            }
+        });*/
+        holder.edit_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                content.set(holder.getAdapterPosition(), item.task(charSequence.toString()));
             }
         });
         holder.delete_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                content.remove(holder.getAdapterPosition());
-                adapter.notifyItemRemoved(holder.getAdapterPosition());
+            content.remove(holder.getAdapterPosition());
+            adapter.notifyItemRemoved(holder.getAdapterPosition());
             }
         });
     }

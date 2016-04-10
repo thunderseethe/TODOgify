@@ -1,6 +1,7 @@
 package com.thunderseethe.todogfy;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 //https://github.com/thunderseethe/TODOgify.git
 
@@ -24,15 +26,16 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
     public static final int FOOTER = 1;
 
     public final List<Todo> content;
+    private final Context context;
 
-    private int choice = 0;
-    private String strName = "0";
-    private String tempString = "";
-    private MainActivity main;
+    //private int choice = 0;
+    //private String strName = "0";
+    //private String tempString = "";
 
-    public TodoAdapter(List<Todo> _content, MainActivity m){
+
+    public TodoAdapter(List<Todo> _content, Context _ctxt){
         this.content = _content;
-        main = m;
+        this.context = _ctxt;
     }
 
     @Override
@@ -76,42 +79,13 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
         holder.edit_text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                tempString = holder.edit_text.getText().toString();
-//                // Get the importance before making a task
-//                AlertDialog.Builder builder = new AlertDialog.Builder(main);
-//                builder.setTitle("Enter Task Importance (default 0)");
-//
-//                // Set up the input
-//                final EditText input = new EditText(main);
-//                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-//                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-//                builder.setView(input);
-//
-//                // Set up the buttons
-//                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        m_Text = input.getText().toString();
-//                    }
-//                });
-//                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        m_Text = "0";
-//                        dialog.cancel();
-//                    }
-//                });
-//
-//                builder.show();
-//                int importance = Integer.parseInt(m_Text);
+                final String task_string = holder.edit_text.getText().toString();
 
-                AlertDialog.Builder builderSingle = new AlertDialog.Builder(main);
+                AlertDialog.Builder builderSingle = new AlertDialog.Builder(context);
                 builderSingle.setIcon(R.drawable.check);
                 builderSingle.setTitle("Select Task Importance");
 
-                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-                        main,
-                        android.R.layout.select_dialog_singlechoice);
+                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.select_dialog_singlechoice);
                 arrayAdapter.add("5");
                 arrayAdapter.add("4");
                 arrayAdapter.add("3");
@@ -123,7 +97,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                choice = 0;
+                                //choice = 0;
                                 dialog.dismiss();
                             }
                         });
@@ -133,48 +107,15 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                //String temp = arrayAdapter.getItem(which);
-                               // choice = Integer.parseInt(temp);
-                                strName = tempString;
+                                String temp = arrayAdapter.getItem(which);
+                                final int choice = Integer.parseInt(temp);
+                                final String task = String.format(Locale.US, "(%d) %s", choice, task_string);
                                 adapter.notifyItemInserted(adapter.content.size());
-                                Todo tmp = new Todo(strName,false);
-                                tmp=tmp.priority(strName);
-                                int priority=tmp.getPriority();
-                                String parsed=tmp.editTask(strName);
-                                adapter.content.add(new Todo(parsed, false, priority));
+                                adapter.content.add(new Todo(task, false, choice));
                             }
                         });
 
                 builderSingle.show();
-
-//                // Sort Content
-//                List<Todo> newContent = new LinkedList<Todo>();
-//                for(Todo todo : content){
-//                    boolean added = false;
-//                    if(newContent.size() == 0){
-//                        newContent.add(todo);
-//                        added = true;
-//                    }
-//                    else{
-//                        for(int x = 0; x < newContent.size(); x++){
-//                            if(todo.getImportance() >= newContent.get(i).getImportance()){
-//                                newContent.add(i,todo);
-//                                added = true;
-//                            }
-//                        }
-//                        if(!added){
-//                            newContent.add(todo);
-//                        }
-//                    }
-//                }
-//
-//                // duplicate newContent into content
-//                while(!content.isEmpty()){
-//                    content.remove(0);
-//                }
-//                for(Todo todo: newContent){
-//                    content.add(todo);
-//                }
 
                 holder.edit_text.setText("");
                 holder.edit_text.requestFocus();
