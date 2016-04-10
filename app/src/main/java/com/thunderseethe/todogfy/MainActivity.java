@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Handler;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -15,11 +17,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
+
+    private TodoAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
         todos.add(new Todo("Test 1", true));
         todos.add(new Todo("Test 2", false));
 
-        list_view.setAdapter(new TodoAdapter(todos));
+        adapter = new TodoAdapter(todos);
+        list_view.setAdapter(adapter);
     }
 
     @Override
@@ -55,7 +61,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_edit:
-                Intent edit_intent = new Intent()
+                Intent edit = new Intent(this, EditActivity.class);
+                edit.putParcelableArrayListExtra("todos", new ArrayList<>(adapter.content));
+                startActivityForResult(edit, 0);
                 //Edit activity intent here
                 return true;
             default:
