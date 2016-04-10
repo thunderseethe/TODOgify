@@ -19,6 +19,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -36,18 +38,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Setup toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         toolbar.setTitleTextColor(0xFF000000);
         toolbar.setBackgroundColor(0xFFFFA500);
         setSupportActionBar(toolbar);
 
+        // Setup notification bar
+        Window window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(0xFFFFA500);
+
+        // Setup recycle view
         list_view = (RecyclerView) findViewById(R.id.list_view);
-
         list_view.setLayoutManager(new LinearLayoutManager(this));
-
         List<Todo> todos = pullTodos();
 
+        // Setup adapter
         adapter = new TodoAdapter(todos);
         list_view.setAdapter(adapter);
     }
