@@ -8,4 +8,10 @@
         android:icon="@drawable/mode_edit"
         app:showAsAction="ifRoom"
         />
+    <item
+        android:id="@+id/action_clear"
+        android:title="Clear"
+        android:icon="@drawable/settings"
+        app:showAsAction="ifRoom"
+        />
 </menu>

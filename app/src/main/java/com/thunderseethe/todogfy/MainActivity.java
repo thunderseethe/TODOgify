@@ -17,9 +17,14 @@ import android.view.MenuItem;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
+
+    private List<Todo> todoList;
+    private RecyclerView listView;
+    private TodoAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +40,15 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView list_view = (RecyclerView) findViewById(R.id.list_view);
 
         list_view.setLayoutManager(new LinearLayoutManager(this));
+        listView = list_view;
 
         List<Todo> todos = new LinkedList<>();
+        todoList = todos;
         todos.add(new Todo("Test 1", true));
         todos.add(new Todo("Test 2", false));
 
-        list_view.setAdapter(new TodoAdapter(todos));
+        adapter = new TodoAdapter(todos);
+        list_view.setAdapter(adapter);
     }
 
     @Override
@@ -51,13 +59,28 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    public List<Todo> filter(List<Todo> oldList){
+        List<Todo> newList = new LinkedList<Todo>();
+
+        //ListIterator<Todo> listIterator = oldList.listIterator();
+        for (Todo todo : oldList) {
+            if(!todo.complete)
+                newList.add(todo);
+        }
+
+        return newList;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_edit:
-                Intent edit_intent = new Intent()
+                Intent edit_intent = new Intent();
                 //Edit activity intent here
                 return true;
+            case R.id.action_clear:
+                listView.setAdapter(new TodoAdapter(filter(adapter.content)));
+
             default:
                 return super.onOptionsItemSelected(item);
         }

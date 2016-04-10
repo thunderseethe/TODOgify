@@ -9,6 +9,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
+import android.os.*;
 
 import org.w3c.dom.Attr;
 
@@ -18,6 +19,8 @@ import org.w3c.dom.Attr;
 public class TodoCardView extends CardView {
     private boolean strikethrough;
     private final Paint strikethrough_paint;
+    private int startX = 20;
+    private int endX = 30;
 
     public TodoCardView(Context context) {
         this(context, null, 0);
@@ -57,7 +60,8 @@ public class TodoCardView extends CardView {
         final int height = getHeight();
         final int width = getWidth();
 
-        if(strikethrough)
+        if(strikethrough) {
             canvas.drawLine(20, height / 2, width - 20, height / 2, strikethrough_paint);
+        }
     }
 }
