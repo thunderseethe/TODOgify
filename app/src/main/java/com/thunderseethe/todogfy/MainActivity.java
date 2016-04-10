@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
     public List<Todo> filter(List<Todo> oldList){
         List<Todo> newList = new LinkedList<Todo>();
 
-        //ListIterator<Todo> listIterator = oldList.listIterator();
         for (Todo todo : oldList) {
             if(!todo.complete)
                 newList.add(todo);
