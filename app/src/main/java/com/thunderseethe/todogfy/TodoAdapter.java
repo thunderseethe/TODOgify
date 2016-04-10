@@ -3,6 +3,7 @@ package com.thunderseethe.todogfy;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
@@ -26,16 +27,15 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
     public static final int FOOTER = 1;
 
     public final List<Todo> content;
-    private final Context context;
+
 
     //private int choice = 0;
     //private String strName = "0";
     //private String tempString = "";
 
 
-    public TodoAdapter(List<Todo> _content, Context _ctxt){
+    public TodoAdapter(List<Todo> _content){
         this.content = _content;
-        this.context = _ctxt;
     }
 
     @Override
@@ -54,7 +54,10 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
         final TodoAdapter adapter = this;
         final Todo item = this.content.get(position);
 
+        Log.d("Priority", String.format("%d %s", item.priority, new String(new char[item.priority]).replace('\0', '!')));
+
         holder.text_view.setText(item.task);
+        holder.priority_view.setText(new String(new char[item.priority]).replace('\0', '!'));
         holder.root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -67,9 +70,11 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
         if(item.complete) {
             holder.root.setBackgroundColor(0xFFE0E0E0);
             holder.text_view.setTextColor(0xFFAAAAAA);
+            holder.priority_view.setTextColor(0xFFAAAAAA);
         } else {
             holder.root.setBackgroundColor(0xFFFFFFFF);
             holder.text_view.setTextColor(0xFF000000);
+            holder.priority_view.setTextColor(0xFF30426B);
         }
     }
 
@@ -79,43 +84,10 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
         holder.edit_text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                final String task_string = holder.edit_text.getText().toString();
+                final String task = holder.edit_text.getText().toString();
 
-                AlertDialog.Builder builderSingle = new AlertDialog.Builder(context);
-                builderSingle.setIcon(R.drawable.check);
-                builderSingle.setTitle("Select Task Importance");
-
-                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.select_dialog_singlechoice);
-                arrayAdapter.add("5");
-                arrayAdapter.add("4");
-                arrayAdapter.add("3");
-                arrayAdapter.add("2");
-                arrayAdapter.add("1");
-
-                builderSingle.setNegativeButton(
-                        "cancel",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                //choice = 0;
-                                dialog.dismiss();
-                            }
-                        });
-
-                builderSingle.setAdapter(
-                        arrayAdapter,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String temp = arrayAdapter.getItem(which);
-                                final int choice = Integer.parseInt(temp);
-                                final String task = String.format(Locale.US, "(%d) %s", choice, task_string);
-                                adapter.notifyItemInserted(adapter.content.size());
-                                adapter.content.add(new Todo(task, false, choice));
-                            }
-                        });
-
-                builderSingle.show();
+                adapter.notifyItemInserted(adapter.content.size());
+                adapter.content.add(new Todo(task, false, 2));
 
                 holder.edit_text.setText("");
                 holder.edit_text.requestFocus();

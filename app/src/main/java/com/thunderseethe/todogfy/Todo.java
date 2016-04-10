@@ -10,7 +10,7 @@ public class Todo implements Parcelable, Cloneable, Comparable<Todo> {
     public final int id;
     public final String task;
     public final boolean complete;
-    private final int priority;
+    public final int priority;
 
     public Todo(String _task){this(-1, _task, false,0);
     }

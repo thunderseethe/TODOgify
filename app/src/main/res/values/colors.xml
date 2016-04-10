@@ -5,5 +5,7 @@
     <color name="colorPrimaryDark">#FF30729B</color>
     <color name="colorAccent">#FF4C87AE</color>
     <color name="title">#FFFFFF</color>
-    <color name="list">#000000</color>
+    <color name="black">#000000</color>
+    <color name="dark_blue">#FF0D1731</color>
+    <color name="orange">#FFF2A433</color>
 </resources>

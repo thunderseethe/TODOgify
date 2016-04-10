@@ -36,7 +36,7 @@ public class NotificationService extends Service {
             new NotificationCompat.Builder(this)
                                 .setContentTitle(todo.task)
                                 .setContentIntent(pending_main_activity)
-                                .setOngoing(true)
+                                .setOngoing(false)
                                 .setSmallIcon(R.drawable.receipt)
                                 .addAction(R.drawable.check, "Complete", pending_complete)
                                 .build();

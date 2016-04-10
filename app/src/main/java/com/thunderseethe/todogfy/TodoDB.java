@@ -11,7 +11,7 @@ import android.provider.BaseColumns;
 public final class TodoDB extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "todo.db";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
     public TodoDB(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -20,7 +20,8 @@ public final class TodoDB extends SQLiteOpenHelper {
     public static final String CREATE_QUERY = "CREATE TABLE " + TodoEntry.TABLE_NAME + " ( " +
         TodoEntry.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
         TodoEntry.COLUMN_TASK + " TEXT, " +
-        TodoEntry.COLUMN_COMPLETED + " INTEGER " +
+        TodoEntry.COLUMN_COMPLETED + " INTEGER, " +
+        TodoEntry.COLUMN_PRIORITY + " INTEGER " +
         " )";
     public static final String DROP_QUERY = "DROP TABLE IF EXISTS " + TodoEntry.TABLE_NAME;
 
@@ -44,5 +45,6 @@ public final class TodoDB extends SQLiteOpenHelper {
         public static final String COLUMN_ID = "id";
         public static final String COLUMN_TASK = "task";
         public static final String COLUMN_COMPLETED = "completed";
+        public static final String COLUMN_PRIORITY  = "priority";
     }
 }

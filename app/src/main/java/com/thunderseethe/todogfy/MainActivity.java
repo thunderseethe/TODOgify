@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /*TodoDB fix_db = new TodoDB(this);
+        fix_db.onUpgrade(fix_db.getWritableDatabase(), 1, 2);*/
         // Setup toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
@@ -65,11 +67,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Setup adapter
         startService(todos);
-        adapter = new TodoAdapter(todos, this);
+        adapter = new TodoAdapter(todos);
         list_view.setAdapter(adapter);
     }
 
     public void startService(List<Todo> todos) {
+        if(todos.isEmpty()) return;
         Intent service = new Intent(this, NotificationService.class);
         service.putExtra("todo", Collections.max(todos));
         startService(service);
@@ -87,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
             int id = c.getInt(c.getColumnIndex(TodoDB.TodoEntry.COLUMN_ID));
             String task  = c.getString(c.getColumnIndex(TodoDB.TodoEntry.COLUMN_TASK));
             boolean complete = c.getInt(c.getColumnIndex(TodoDB.TodoEntry.COLUMN_COMPLETED)) != 0;
-            todos.add(new Todo(id, task, complete));
+            int priority = c.getInt(c.getColumnIndex(TodoDB.TodoEntry.COLUMN_PRIORITY));
+
+            todos.add(new Todo(id, task, complete, priority));
         } while(c.moveToNext());
 
         c.close();
@@ -105,11 +110,12 @@ public class MainActivity extends AppCompatActivity {
         db.execSQL("DELETE FROM " + TodoDB.TodoEntry.TABLE_NAME + ";");
 
         for(Todo todo : adapter.content) {
-
             if(todo.id != -1)
                 values.put(TodoDB.TodoEntry.COLUMN_ID, todo.id);
+
             values.put(TodoDB.TodoEntry.COLUMN_TASK, todo.task);
             values.put(TodoDB.TodoEntry.COLUMN_COMPLETED, todo.complete ? 1 : 0);
+            values.put(TodoDB.TodoEntry.COLUMN_PRIORITY, todo.priority);
 
             db.insert(TodoDB.TodoEntry.TABLE_NAME, null, values);
         }
@@ -127,33 +133,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public List<Todo> filterNotCompleted(List<Todo> oldList){
-        List<Todo> newList = new LinkedList<Todo>();
+        List<Todo> newList = new LinkedList<>();
 
         for (Todo todo : oldList) {
             if(!todo.complete)
                 newList.add(todo);
         }
 
-        if(newList.size() == 0){
-            Intent intent = new Intent();
-            PendingIntent pIntent = PendingIntent.getActivity(this,0,intent,0);
-            final Notification push = new Notification.Builder(this)
-                    .setTicker("Ticker Title")
-                    .setContentTitle("All Tasks Completed")
-                    .setContentText("Congratulations! Click me to update tasks")
-                    .setSmallIcon(R.drawable.check)
-                    .setContentIntent(pIntent).getNotification();
-            push.flags=Notification.FLAG_AUTO_CANCEL;
-            final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            //notificationManager.notify(0, push);
-
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    notificationManager.notify(0, push);
-                }
-            }, 2000);
-        }
         return newList;
     }
 
@@ -166,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(edit_intent, 0);
                 return true;
             case R.id.action_clear:
-                adapter = new TodoAdapter(filterNotCompleted(adapter.content), this);
+                adapter = new TodoAdapter(filterNotCompleted(adapter.content));
                 list_view.setAdapter(adapter);
                 return true;
             default:
@@ -180,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         if(data == null) return;
 
         List<Todo> todos = data.getParcelableArrayListExtra("todos");
-        adapter = new TodoAdapter(todos, this);
+        adapter = new TodoAdapter(todos);
         list_view.setAdapter(adapter);
     }
 }

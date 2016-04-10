@@ -15,6 +15,8 @@ public class TodoVH extends RecyclerView.ViewHolder {
     public final int type;
 
     public TextView text_view;
+    public TextView priority_view;
+
     public EditText edit_text;
 
     public View root;
@@ -23,9 +25,12 @@ public class TodoVH extends RecyclerView.ViewHolder {
         super(itemView);
         this.type = type;
         this.root = itemView;
-        if(type == TodoAdapter.ITEM)
+        if(type == TodoAdapter.ITEM) {
             this.text_view = (TextView) itemView.findViewById(R.id.text_view);
-        if(type == TodoAdapter.FOOTER)
+            this.priority_view = (TextView) itemView.findViewById(R.id.priority_view);
+        }
+        if(type == TodoAdapter.FOOTER) {
             this.edit_text = (EditText) itemView.findViewById(R.id.edit_text);
+        }
     }
 }
