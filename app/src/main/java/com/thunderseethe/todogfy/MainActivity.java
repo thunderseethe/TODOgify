@@ -1,5 +1,8 @@
 package com.thunderseethe.todogfy;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -56,10 +59,6 @@ public class MainActivity extends AppCompatActivity {
         list_view = (RecyclerView) findViewById(R.id.list_view);
         list_view.setLayoutManager(new LinearLayoutManager(this));
         List<Todo> todos = pullTodos();
-
-        // Edit the button colors
-//        ImageView imageViewIcon = (ImageView) list_view.findViewById(R.id.action_edit);
-//        imageViewIcon.setColorFilter(R.color.title);
 
         // Setup adapter
         adapter = new TodoAdapter(todos);
@@ -120,6 +119,19 @@ public class MainActivity extends AppCompatActivity {
                 newList.add(todo);
         }
 
+        if(newList.size() == 0){
+            Intent intent = new Intent();
+            PendingIntent pIntent = PendingIntent.getActivity(this,0,intent,0);
+            Notification push = new Notification.Builder(this)
+                    .setTicker("Ticker Title")
+                    .setContentTitle("All Tasks Completed")
+                    .setContentText("Congratulations! Click me to update tasks")
+                    .setSmallIcon(R.drawable.check)
+                    .setContentIntent(pIntent).getNotification();
+            push.flags=Notification.FLAG_AUTO_CANCEL;
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.notify(0, push);
+        }
         return newList;
     }
 
