@@ -21,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -55,6 +56,10 @@ public class MainActivity extends AppCompatActivity {
         list_view = (RecyclerView) findViewById(R.id.list_view);
         list_view.setLayoutManager(new LinearLayoutManager(this));
         List<Todo> todos = pullTodos();
+
+        // Edit the button colors
+//        ImageView imageViewIcon = (ImageView) list_view.findViewById(R.id.action_edit);
+//        imageViewIcon.setColorFilter(R.color.title);
 
         // Setup adapter
         adapter = new TodoAdapter(todos);
