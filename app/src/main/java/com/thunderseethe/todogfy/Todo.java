@@ -27,6 +27,7 @@ public class Todo implements Parcelable {
     public Todo complete(boolean _complete) {
         return new Todo(task, _complete);
     }
+    public boolean getComplete(){return complete;}
     public Todo task(String _task) {
         return new Todo(_task, complete);
     }
