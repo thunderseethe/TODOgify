@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -122,15 +123,22 @@ public class MainActivity extends AppCompatActivity {
         if(newList.size() == 0){
             Intent intent = new Intent();
             PendingIntent pIntent = PendingIntent.getActivity(this,0,intent,0);
-            Notification push = new Notification.Builder(this)
+            final Notification push = new Notification.Builder(this)
                     .setTicker("Ticker Title")
                     .setContentTitle("All Tasks Completed")
                     .setContentText("Congratulations! Click me to update tasks")
                     .setSmallIcon(R.drawable.check)
                     .setContentIntent(pIntent).getNotification();
             push.flags=Notification.FLAG_AUTO_CANCEL;
-            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            notificationManager.notify(0, push);
+            final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            //notificationManager.notify(0, push);
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    notificationManager.notify(0, push);
+                }
+            }, 2000);
         }
         return newList;
     }
