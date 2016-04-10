@@ -21,7 +21,7 @@ public class Todo implements Parcelable {
 
     protected Todo(Parcel in) {
         task = in.readString();
-        complete = in.readByte() != 0;
+        complete = in.readInt() != 0;
     }
 
     public Todo complete(boolean _complete) {
@@ -45,9 +45,7 @@ public class Todo implements Parcelable {
     public static final Creator<Todo> CREATOR = new Creator<Todo>() {
         @Override
         public Todo createFromParcel(Parcel in) {
-            String task = in.readString();
-            boolean complete = in.readInt() == 1;
-            return new Todo(task, complete);
+            return new Todo(in);
         }
 
         @Override
@@ -55,4 +53,13 @@ public class Todo implements Parcelable {
             return new Todo[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof Todo) {
+            Todo t = (Todo) o;
+            return t.complete == this.complete && t.task.equals(this.task);
+        }
+        return false;
+    }
 }

@@ -25,6 +25,7 @@ import java.util.zip.Inflater;
 public class MainActivity extends AppCompatActivity {
 
     private TodoAdapter adapter;
+    private RecyclerView list_view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setBackgroundColor(0xFFFFA500);
         setSupportActionBar(toolbar);
 
-        RecyclerView list_view = (RecyclerView) findViewById(R.id.list_view);
+        list_view = (RecyclerView) findViewById(R.id.list_view);
 
         list_view.setLayoutManager(new LinearLayoutManager(this));
 
@@ -70,5 +71,14 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(data == null) return;
+
+        List<Todo> todos = data.getParcelableArrayListExtra("todos");
+        adapter = new TodoAdapter(todos);
+        list_view.setAdapter(adapter);
     }
 }

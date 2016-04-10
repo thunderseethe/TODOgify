@@ -56,7 +56,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
             holder.root.setBackgroundColor(0xFFFFFFFF);
             holder.text_view.setTextColor(0xFF000000);
         }
-
     }
 
     public void bindFooter(final TodoVH holder, final List<Todo> content) {
@@ -75,7 +74,6 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
                 return true;
             }
         });
-        //holder.edit_text.requestFocus();
     }
 
     @Override
