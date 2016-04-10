@@ -10,16 +10,16 @@ public class Todo implements Parcelable, Cloneable, Comparable<Todo> {
     public final int id;
     public final String task;
     public final boolean complete;
-    public final int priority;
+    private final int priority;
 
-    public Todo(String _task){
-        this(-1, _task, false);
+    public Todo(String _task){this(-1, _task, false,0);
     }
     public Todo(String _task, boolean _complete) {
-        this(-1, _task, _complete);
+        this(-1, _task, _complete,0);
     }
-    public Todo(String _task, boolean _complete, int _importance){
-        this(-1, _task, _complete, _importance);
+
+    public Todo(String _task, boolean _complete, int _priority){
+        this(-1,_task,_complete,_priority);
     }
     public Todo(int _id, String _task, boolean _complete) {
         this(_id, _task, _complete, 0);
@@ -48,9 +48,6 @@ public class Todo implements Parcelable, Cloneable, Comparable<Todo> {
         return new Todo(id, task, complete, _priority);
     }
 
-    //public int getImportance(){return importance;}
-    //public void setImportance(int i){importance = i;}
-
     @Override
     public int describeContents() {
         return 0;
@@ -71,8 +68,7 @@ public class Todo implements Parcelable, Cloneable, Comparable<Todo> {
         }
 
         @Override
-        public Todo[] newArray(int size) {
-            return new Todo[size];
+        public Todo[] newArray(int size) {return new Todo[size];
         }
     };
 
@@ -80,7 +76,7 @@ public class Todo implements Parcelable, Cloneable, Comparable<Todo> {
     public boolean equals(Object o) {
         if(o instanceof Todo) {
             Todo t = (Todo) o;
-            return t.complete == this.complete && t.task.equals(this.task);
+            return t.complete == this.complete && t.task.equals(this.task)&&t.priority==this.priority;
         }
         return false;
     }

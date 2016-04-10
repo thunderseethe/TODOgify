@@ -1,6 +1,7 @@
 package com.thunderseethe.todogfy;
 
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
