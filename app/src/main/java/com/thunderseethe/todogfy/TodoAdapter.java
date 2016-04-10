@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.LinkedList;
 import java.util.List;
 
 //https://github.com/thunderseethe/TODOgify.git
@@ -111,11 +112,11 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
                 final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
                         main,
                         android.R.layout.select_dialog_singlechoice);
-                arrayAdapter.add("1");
-                arrayAdapter.add("2");
-                arrayAdapter.add("3");
-                arrayAdapter.add("4");
                 arrayAdapter.add("5");
+                arrayAdapter.add("4");
+                arrayAdapter.add("3");
+                arrayAdapter.add("2");
+                arrayAdapter.add("1");
 
                 builderSingle.setNegativeButton(
                         "cancel",
@@ -141,6 +142,35 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
                         });
 
                 builderSingle.show();
+
+//                // Sort Content
+//                List<Todo> newContent = new LinkedList<Todo>();
+//                for(Todo todo : content){
+//                    boolean added = false;
+//                    if(newContent.size() == 0){
+//                        newContent.add(todo);
+//                        added = true;
+//                    }
+//                    else{
+//                        for(int x = 0; x < newContent.size(); x++){
+//                            if(todo.getImportance() >= newContent.get(i).getImportance()){
+//                                newContent.add(i,todo);
+//                                added = true;
+//                            }
+//                        }
+//                        if(!added){
+//                            newContent.add(todo);
+//                        }
+//                    }
+//                }
+//
+//                // duplicate newContent into content
+//                while(!content.isEmpty()){
+//                    content.remove(0);
+//                }
+//                for(Todo todo: newContent){
+//                    content.add(todo);
+//                }
 
                 holder.edit_text.setText("");
                 holder.edit_text.requestFocus();
