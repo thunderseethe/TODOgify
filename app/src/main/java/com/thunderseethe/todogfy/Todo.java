@@ -44,10 +44,35 @@ public class Todo implements Parcelable, Cloneable, Comparable<Todo> {
     public Todo complete(boolean _complete) {
         return new Todo(id, task, _complete, priority);
     }
-    public Todo priority(int _priority){
-        return new Todo(id, task, complete, _priority);
+
+    public Todo priority(String _task) { //function to find the importance of a todo given the number of "!"s at the end of the string
+        if(!_task.contains("!"))
+            return new Todo(id,task,complete,0); //case for if there are no !'s
+        int sum=0;
+        for(int i=_task.lastIndexOf("!");i>=_task.indexOf("!");i--){//if there are !'s, step backwards through the string until you reach a non-! character
+            if(_task.charAt(i)=='!')
+                sum++;
+            else
+                break; //breaking if there's a character between the first and last "!"
+        }
+        if(sum>5)
+            sum=5;
+        return new Todo(id,task,complete,sum);
     }
 
+    public Todo editTask(String _task){
+        String clone; //cloning the _task for editting purposes
+        int end =_task.length()-1;
+        for(int i=_task.lastIndexOf("!"); i>= 0;i--) {
+            if(_task.charAt(i)!='!'){
+                end=i;
+                break;
+            }
+        }
+
+        clone=_task.substring(0,end+1);
+        return new Todo(id,clone,complete,priority);
+    }
     @Override
     public int describeContents() {
         return 0;

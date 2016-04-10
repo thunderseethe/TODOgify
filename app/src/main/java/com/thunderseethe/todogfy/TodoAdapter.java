@@ -110,8 +110,11 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
                                 String temp = arrayAdapter.getItem(which);
                                 final int choice = Integer.parseInt(temp);
                                 final String task = String.format(Locale.US, "(%d) %s", choice, task_string);
+                                Todo next = new Todo(task_string,false);
+                                next=next.priority(task_string);
+                                next=next.editTask(task_string);
                                 adapter.notifyItemInserted(adapter.content.size());
-                                adapter.content.add(new Todo(task, false, choice));
+                                adapter.content.add(next);
                             }
                         });
 
