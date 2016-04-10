@@ -67,14 +67,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Setup adapter
         startService(todos);
-        adapter = new TodoAdapter(todos);
+        adapter = new TodoAdapter(todos, this);
         list_view.setAdapter(adapter);
     }
 
     public void startService(List<Todo> todos) {
         if(todos.isEmpty()) return;
         Intent service = new Intent(this, NotificationService.class);
-        service.putExtra("todo", Collections.max(todos));
+        service.putExtra("todo", Collections.max(filterNotCompleted(todos)));
+        service.setAction("start");
         startService(service);
     }
 
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             values.put(TodoDB.TodoEntry.COLUMN_COMPLETED, todo.complete ? 1 : 0);
             values.put(TodoDB.TodoEntry.COLUMN_PRIORITY, todo.priority);
 
-            db.insert(TodoDB.TodoEntry.TABLE_NAME, null, values);
+            db.insertWithOnConflict(TodoDB.TodoEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
         }
 
         db.setTransactionSuccessful();
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(edit_intent, 0);
                 return true;
             case R.id.action_clear:
-                adapter = new TodoAdapter(filterNotCompleted(adapter.content));
+                adapter = new TodoAdapter(filterNotCompleted(adapter.content), this);
                 list_view.setAdapter(adapter);
                 return true;
             default:
@@ -166,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         if(data == null) return;
 
         List<Todo> todos = data.getParcelableArrayListExtra("todos");
-        adapter = new TodoAdapter(todos);
+        adapter = new TodoAdapter(todos, this);
         list_view.setAdapter(adapter);
     }
 }

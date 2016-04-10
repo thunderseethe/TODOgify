@@ -1,24 +1,16 @@
 package com.thunderseethe.todogfy;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.res.Resources;
-import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
-import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 //https://github.com/thunderseethe/TODOgify.git
 
@@ -27,15 +19,13 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
     public static final int FOOTER = 1;
 
     public final List<Todo> content;
+    private final MainActivity activity;
+    private boolean editing = false;
 
 
-    //private int choice = 0;
-    //private String strName = "0";
-    //private String tempString = "";
-
-
-    public TodoAdapter(List<Todo> _content){
+    public TodoAdapter(List<Todo> _content, MainActivity _activity){
         this.content = _content;
+        this.activity = _activity;
     }
 
     @Override
@@ -54,7 +44,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
         final TodoAdapter adapter = this;
         final Todo item = this.content.get(position);
 
-        Log.d("Priority", String.format("%d %s", item.priority, new String(new char[item.priority]).replace('\0', '!')));
+        //Log.d("Priority", String.format("%d %s", item.priority, new String(new char[item.priority]).replace('\0', '!')));
 
         holder.text_view.setText(item.task);
         holder.priority_view.setText(new String(new char[item.priority]).replace('\0', '!'));
@@ -78,19 +68,39 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
         }
     }
 
-    public void bindFooter(final TodoVH holder, final List<Todo> content) {
+    private Todo _priority(int priority, String _task){
+        char last_char = _task.charAt(_task.length() - 1);
+        if(last_char != '!')
+            return new Todo(_task, false, priority);
+        else
+            return _priority(priority + 1, _task.substring(0, _task.length() - 1));
+    }
+    public Todo priority(String _task) {
+        return _priority(0, _task);
+    }
+
+
+    public void bindFooter(final TodoVH holder) {
         //Empty for now
         final TodoAdapter adapter = this;
+
+        if(editing)
+            holder.edit_text.requestFocus();
+
         holder.edit_text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 final String task = holder.edit_text.getText().toString();
 
-                adapter.notifyItemInserted(adapter.content.size());
-                adapter.content.add(new Todo(task, false, 2));
+                adapter.content.add(priority(task.trim()));
+                Collections.sort(adapter.content);
+                adapter.notifyDataSetChanged();
 
+                editing = true;
                 holder.edit_text.setText("");
-                holder.edit_text.requestFocus();
+
+                activity.startService(adapter.content);
+
                 return true;
             }
         });
@@ -103,7 +113,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoVH> {
                 bindItem(holder, position);
                 break;
             case FOOTER:
-                bindFooter(holder, this.content);
+                bindFooter(holder);
                 break;
         }
 
